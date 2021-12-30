@@ -1,0 +1,20 @@
+#pragma kernel CSMain
+
+RWTexture2D<float4> Result;
+
+Texture2D TileTexture;
+int TextureWidth;
+int TextureHeight;
+
+StructuredBuffer<float4> Colors;
+int Width; 
+int Height;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    float2 ti = float2(id.x % TextureWidth, id.y % TextureHeight);
+    float ci = id.x / TextureWidth + id.y / TextureHeight * Width;
+    float4 color = Colors[ci];
+    Result[id.xy] = float4(TileTexture[ti].x * color.x, TileTexture[ti].y * color.y, TileTexture[ti].z * color.z, TileTexture[ti].w * color.w);
+}
