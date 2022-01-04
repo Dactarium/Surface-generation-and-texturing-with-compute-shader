@@ -162,7 +162,7 @@ public class SurfaceGenerator
         computeShader.SetInt("Width", width - 1);
         computeShader.SetInt("Height", height - 1);
 
-        computeShader.Dispatch(0, 8 * resolution[0], 8 * resolution[1], 1);
+        computeShader.Dispatch(0, (width * resolution[0]) / 8, (height * resolution[1]) / 8, 1);
 
         computeBuffer.Release();
 
