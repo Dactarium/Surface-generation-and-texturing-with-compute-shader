@@ -13,22 +13,19 @@ Unity mesh generation script also adds custom texture generation with compute sh
     public class SimpleExample : MonoBehaviour
     {
         public ComputeShader computeShader;
+		public Material material;
 
         public int width = 10; 
         public int height = 10;
         public Vector2 scale = new Vector2(1, 1);
-
-        SurfaceGenerator surfaceGenerator;
-
+		
         GameObject surface;
 
         void Awake()
         {
-            surfaceGenerator = new SurfaceGenerator(computeShader);
-
             // (width * scale.x) x (height * scale.y) surface
             // verticies count = width * height
-            surface = surfaceGenerator.generate(width, height, scale);
+            surface = SurfaceGenerator.generate(computeShader, material, width, height, scale);
        }
 
     }
@@ -44,20 +41,17 @@ Unity mesh generation script also adds custom texture generation with compute sh
     {
         public ComputeShader computeShader;
         public Texture2D texture;
+		public Material material;
 
         public int width;
         public int height;
-
-        SurfaceGenerator surfaceGenerator;
-
+		
         GameObject surface;
 
         void Awake()
         {
-            surfaceGenerator = new SurfaceGenerator(computeShader);
-
             // Color per tile (if there is no texture it works for per pixel)
-            Color[] colors = new Color[surfaceGenerator.calculateColorsLength(width, height, Vector2.one)];
+            Color[] colors = new Color[SurfaceGenerator.calculateColorsLength(width, height, Vector2.one)];
 
             // Setting random colors for visualisation
             for(int i = 0; i < colors.Length; i++){
@@ -66,7 +60,7 @@ Unity mesh generation script also adds custom texture generation with compute sh
 
             // (width) x (height) textured surface
             // verticies count = width * height
-            surface = surfaceGenerator.generate(width, height, texture, colors);
+            surface = SurfaceGenerator.generate(computeShader, material, width, height, texture, colors);
        }
 
     }
@@ -81,19 +75,18 @@ Unity mesh generation script also adds custom texture generation with compute sh
     public class YExample : MonoBehaviour
     {
         public ComputeShader computeShader;
+		public Material material;
 
         public int width;
         public int height;
 
-        SurfaceGenerator surfaceGenerator;
 
         GameObject surface;
 
         void Awake()
         {
-          surfaceGenerator = new SurfaceGenerator(computeShader);
           // Color per tile (if there is no texture it works for per pixel)
-          Color[] colors = new Color[surfaceGenerator.calculateColorsLength(width, height)];
+          Color[] colors = new Color[SurfaceGenerator.calculateColorsLength(width, height)];
 
           // Setting random colors for visualisation
           for(int i = 0; i < colors.Length; i++){
@@ -113,7 +106,7 @@ Unity mesh generation script also adds custom texture generation with compute sh
 
           // (width) x (height) colored surface 
           // verticies count = width * height
-          surface = surfaceGenerator.generate(width, height, y, colors);
+          surface = SurfaceGenerator.generate(computeShader, material, width, height, y, colors);
        }
 
     }

@@ -4,56 +4,53 @@ using UnityEngine;
 
 public class SurfaceGenerator
 {   
-    ComputeShader computeShader;
-    public SurfaceGenerator(ComputeShader computeShader){
-        this.computeShader = computeShader;
+    public static GameObject generate(ComputeShader computeShader, Material material, int width, int height, Color[] colors){
+        return generate(computeShader, material, width, height, null, null, null, colors);
     }
 
-    public GameObject generate(int width, int height, Color[] colors){
-        return generate(width, height, null, null, null, colors);
+    public static GameObject generate(ComputeShader computeShader, Material material, int width, int height, Texture2D tileTexture){
+        return generate(computeShader, material, width, height, null, null, tileTexture, null);
     }
 
-    public GameObject generate(int width, int height, Texture2D tileTexture){
-        return generate(width, height, null, null, tileTexture, null);
+    public static GameObject generate(ComputeShader computeShader, Material material, int width, int height, Texture2D tileTexture, Color[] colors){
+        return generate(computeShader, material, width, height, null, null, tileTexture, colors);
     }
 
-    public GameObject generate(int width, int height, Texture2D tileTexture, Color[] colors){
-        return generate(width, height, null, null, tileTexture, colors);
+    public static GameObject generate(ComputeShader computeShader, Material material, int width, int height, Vector2 scale){
+        return generate(computeShader, material, width, height, null, scale, null, null);
     }
 
-    public GameObject generate(int width, int height, Vector2 scale){
-        return generate(width, height, null, scale, null, null);
+    public static GameObject generate(ComputeShader computeShader, Material material, int width, int height, Vector2 scale, Color[] colors){
+        return generate(computeShader, material, width, height, null, scale, null, colors);
     }
 
-    public GameObject generate(int width, int height, Vector2 scale, Color[] colors){
-        return generate(width, height, null, scale, null, colors);
+    public static GameObject generate(ComputeShader computeShader, Material material, int width, int height, Vector2 scale, Texture2D tileTexture){
+        return generate(computeShader, material, width, height, null, scale, tileTexture, null);
     }
 
-    public GameObject generate(int width, int height, Vector2 scale, Texture2D tileTexture){
-        return generate(width, height, null, scale, tileTexture, null);
+    public static GameObject generate(ComputeShader computeShader, Material material, int width, int height, Vector2 scale, Texture2D tileTexture, Color[] colors){
+        return generate(computeShader, material, width, height, null, scale,  tileTexture,  colors);
     }
 
-    public GameObject generate(int width, int height, Vector2 scale, Texture2D tileTexture, Color[] colors){
-        return generate(width, height, null, scale,  tileTexture,  colors);
+    public static GameObject generate(ComputeShader computeShader, Material material, int width, int height, float[,] y, Color[] colors){
+        return generate(computeShader, material, width, height, y, null, null, colors);
     }
 
-    public GameObject generate(int width, int height, float[,] y, Color[] colors){
-        return generate(width, height, y, null, null, colors);
+    public static GameObject generate(ComputeShader computeShader, Material material, int width, int height, float[,] y, Texture2D tileTexture){
+        return generate(computeShader, material, width, height, y, null, tileTexture, null);
     }
 
-    public GameObject generate(int width, int height, float[,] y, Texture2D tileTexture){
-        return generate(width, height, y, null, tileTexture, null);
+    public static GameObject generate(ComputeShader computeShader, Material material, int width, int height, float[,] y, Texture2D tileTexture, Color[] colors){ 
+        return generate(computeShader, material, width, height, y, null, tileTexture, colors);
     }
 
-    public GameObject generate(int width, int height, float[,] y, Texture2D tileTexture, Color[] colors){ 
-        return generate(width, height, y, null, tileTexture, colors);
+    public static GameObject generate(ComputeShader computeShader, Material material, int width, int height, float[,] y ,Vector2 scale, Color[] colors){ 
+        return generate(computeShader, material, width, height, y, scale, null, colors);
     }
 
-    public GameObject generate(int width, int height, float[,] y ,Vector2 scale, Color[] colors){ 
-        return generate(width, height, y, scale, null, colors);
-    }
-
-    public GameObject generate(int width, int height, float[,] y = null, Vector2? scale = null, Texture2D tileTexture = null, Color[] colors = null){
+    public static GameObject generate(ComputeShader computeShader, Material material, int width, int height, float[,] y = null, Vector2? scale = null, Texture2D tileTexture = null, Color[] colors = null){
+        
+        
         if(!scale.HasValue) scale = Vector2.one;
         int[] textureSize = {(int)(width * scale.Value.x), (int)(height * scale.Value.y)};
         
@@ -70,18 +67,14 @@ public class SurfaceGenerator
         Mesh mesh = generateMesh(width, height, y, scale);
         meshFilter.sharedMesh = mesh;
 
-        Material material = new Material(Shader.Find("Standard"));
-        material.mainTexture = generateTexture(textureSize[0], textureSize[1], tileTexture, colors);
-        material.color = Color.white;
-        material.SetFloat("_Metallic", 1f);
-        material.SetFloat("_Glossiness", 0f);
-
-        meshRenderer.sharedMaterial = material;
+        Material textureMaterial = new Material(material);
+        textureMaterial.mainTexture = generateTexture(computeShader, textureSize[0], textureSize[1], tileTexture, colors);
+        meshRenderer.sharedMaterial = textureMaterial;
 
         return surface;
     }
 
-    public Mesh generateMesh(int width, int height, float[,] y = null, Vector2? scale = null){
+    public static Mesh generateMesh(int width, int height, float[,] y = null, Vector2? scale = null){
         Mesh generatedMesh = new Mesh();
         
         if(!scale.HasValue) scale = Vector2.one;
@@ -127,7 +120,7 @@ public class SurfaceGenerator
         return generatedMesh;
     }
 
-    public RenderTexture generateTexture(int width, int height, Texture2D tileTexture, Color[] colors){
+    public static RenderTexture generateTexture(ComputeShader computeShader, int width, int height, Texture2D tileTexture, Color[] colors){
         int[] resolution = {1, 1};
         if(tileTexture == null){
             tileTexture = new Texture2D(1, 1);
@@ -161,19 +154,24 @@ public class SurfaceGenerator
         computeShader.SetBuffer(0, "Colors", computeBuffer);
         computeShader.SetInt("Width", width - 1);
 
-        computeShader.Dispatch(0, (width * resolution[0]) / 8, (height * resolution[1]) / 8, 1);
+        int threadGroupX = (width * resolution[0]) / 8;
+        int threadGroupY = (height * resolution[1]) / 8;
+        threadGroupX += (threadGroupX == 0)? 1:0;
+        threadGroupY += (threadGroupY == 0)? 1:0;
+
+        computeShader.Dispatch(0, threadGroupX, threadGroupY, 1);
 
         computeBuffer.Release();
 
         return renderTexture;
     }
 
-    public int calculateColorsLength(int width, int height, Vector2? scale = null){
+    public static int calculateColorsLength(int width, int height, Vector2? scale = null){
         if(!scale.HasValue) scale = Vector2.one;
         return (int)((width + 1) * (height + 1) * scale.Value.x * scale.Value.y);
     }
 
-    public Color[] createColorArray(int width, int height, Vector2? scale = null, Color? color = null){
+    public static Color[] createColorArray(int width, int height, Vector2? scale = null, Color? color = null){
         Color[] colors = new Color[calculateColorsLength(width, height, scale)];
 
         Color _color = (color.HasValue)? color.Value: Color.gray;
@@ -185,6 +183,4 @@ public class SurfaceGenerator
         return colors;
     }
 
-
-    
 }
